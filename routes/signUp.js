@@ -12,6 +12,20 @@ router.get('/', (req, res) => {
     })
 })
 
+router.get('/check-email/:email', (req, res) => {
+    User.find({email: req.params.email})
+    .then(result => {
+        if(result && result.length !== 0){
+            res.json({message: "Email already taken."})
+        } else {
+            res.json({message: "Email is available!"})
+        }
+    })
+    .catch(err => {
+        console.log(err)
+    })
+})
+
 router.post('/', (req, res) => {
     const user = new User({
         email: req.body.email,
