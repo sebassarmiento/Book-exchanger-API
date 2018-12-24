@@ -29,7 +29,10 @@ router.get('/check-email/:email', (req, res) => {
 router.post('/', (req, res) => {
     const user = new User({
         email: req.body.email,
-        password: req.body.password
+        password: req.body.password,
+        username: req.body.username,
+        gender: req.body.gender,
+        age: req.body.age
     })
     user.save()
     .then(result => {
