@@ -15,6 +15,19 @@ router.get('/', (req, res) => {
     })
 })
 
+router.get('/:bookId', (req, res) => {
+    Book.findById(req.params.bookId)
+    .select('-__v')
+    .then(result => {
+        console.log(result)
+        res.status(200).json(result)
+    })
+    .catch(err => {
+        console.log(result)
+        res.status(500).json(err)
+    })
+})
+
 router.post('/', (req, res) => {
     const book = new Book({
         name: req.body.name,
