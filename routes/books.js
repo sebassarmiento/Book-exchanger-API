@@ -33,6 +33,7 @@ router.post('/', (req, res) => {
         name: req.body.name,
         category: req.body.category,
         place: req.body.place,
+        image: req.body.image,
         pages: req.body.pages
     })
     book.save()
