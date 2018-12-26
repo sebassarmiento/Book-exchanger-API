@@ -8,7 +8,7 @@ router.post('/', (req, res) => {
     .then(result => {
         if(result && result.length !== 0){
             if(result[0].password === req.body.password){
-                res.status(200).json({message: "Access granted"})
+                res.status(200).json({message: "Access granted", user: result[0] })
             } else {
                 res.status(500).json({message: "Invalid data"})
             }
