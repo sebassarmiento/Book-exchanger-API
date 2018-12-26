@@ -15,4 +15,20 @@ router.get('/', (req, res) => {
     })
 })
 
+router.post('/', (req, res) => {
+    const book = new Book({
+        name: req.body.name,
+        category: req.body.category,
+        place: req.body.place,
+        pages: req.body.pages
+    })
+    book.save()
+    .then(result => {
+        res.status(200).json({message: "Book was added!", book: result})
+    })
+    .catch(err => {
+        res.status(500).json({message: "Could not add book", error: err})
+    })
+})
+
 module.exports = router
