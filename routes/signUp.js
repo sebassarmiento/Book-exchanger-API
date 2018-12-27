@@ -1,5 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+
 const User = require('../models/userModel');
 
 router.get('/', (req, res) => {
@@ -27,19 +30,37 @@ router.get('/check-email/:email', (req, res) => {
 })
 
 router.post('/', (req, res) => {
-    const user = new User({
-        email: req.body.email,
-        password: req.body.password,
-        username: req.body.username,
-        gender: req.body.gender,
-        age: req.body.age
-    })
-    user.save()
+    User.findOne({email: req.body.email})
     .then(result => {
-        res.status(200).json({message: "User added successfully!", user: result})
+        if(result){
+            res.status(500).json({message: "User email is already taken."})
+        } else {
+            bcrypt.hash(req.body.password, 10 , (err, hash) => {
+                if(err){
+                    console.log('Entra en error', err)
+                    return res.status(500).json(err)
+                } else {
+                    const user = new User({
+                        email: req.body.email,
+                        password: hash,
+                        username: req.body.username,
+                        gender: req.body.gender,
+                        age: req.body.age
+                    })
+                    user.save()
+                    .then(result => {
+                        res.status(200).json({message: "User added successfully!", user: result})
+                    })
+                    .catch(err => {
+                        res.status(500).json({message: "Could not add user", error: err})
+                    })
+                }
+            })
+        }
     })
     .catch(err => {
-        res.status(500).json({message: "Could not add user", error: err})
+        console.log(err)
+        res.status(500).json(err)
     })
 })
 
