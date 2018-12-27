@@ -1,17 +1,32 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const User = require('../models/userModel');
 
 router.post('/', (req, res) => {
-    User.find({email: req.body.email})
-    .then(result => {
-        if(result && result.length !== 0){
-            if(result[0].password === req.body.password){
-                res.status(200).json({message: "Access granted", user: result[0] })
-            } else {
-                res.status(500).json({message: "Invalid data"})
-            }
+    User.findOne({email: req.body.email})
+    .then(user => {
+        if(user){
+            bcrypt.compare(req.body.password, user.password, (err, result) => {
+                if(err){
+                    return res.status(500).json({
+                        message: "Invalid login data",
+                        error: err
+                    })
+                } else {
+                    const token = jwt.sign({
+                        email: user.email,
+                        id: user._id
+                    }, 'secret', {expiresIn: "1h"})
+                    return res.status(200).json({
+                        message: "Auth successful",
+                        token,
+                        user
+                    })
+                }
+            })
         } else {
             res.status(500).json({message: "Invalid data"})
         }
