@@ -15,7 +15,7 @@ router.get('/', (req, res) => {
     })
 })
 
-router.get('/:bookId', (req, res) => {
+router.get('/id/:bookId', (req, res) => {
     Book.findById(req.params.bookId)
     .select('-__v')
     .then(result => {
@@ -34,6 +34,8 @@ router.post('/', (req, res) => {
         category: req.body.category,
         place: req.body.place,
         image: req.body.image,
+        author: req.body.author,
+        description: req.body.description,
         pages: req.body.pages
     })
     book.save()

@@ -5,6 +5,8 @@ const Book = mongoose.Schema({
     category: { type: String, required: true },
     place: { type: String, required: true },
     image: { type: String, required: true },
+    author: String,
+    description: String,
     pages: Number
 })
 
