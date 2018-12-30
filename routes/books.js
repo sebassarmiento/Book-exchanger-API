@@ -37,6 +37,7 @@ router.post('/', (req, res) => {
         author: req.body.author,
         description: req.body.description,
         username: req.body.username,
+        userId: req.body.userId,
         date: req.body.date,
         pages: req.body.pages
     })

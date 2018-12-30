@@ -6,6 +6,7 @@ const Book = mongoose.Schema({
     place: { type: String, required: true },
     image: { type: String, required: true },
     username: { type: String, required: true },
+    userId: { type: String, required: true },
     date: { type: Number, required: true },
     author: String,
     description: String,
