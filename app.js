@@ -8,6 +8,7 @@ const validToken = require('./middleware/validToken');
 const signUpRouter = require('./routes/signUp');
 const loginRouter = require('./routes/login');
 const booksRouter = require('./routes/books');
+const userRouter = require('./routes/user');
 
 mongoose.connect('mongodb+srv://sebastian:sarmiento@cluster0-ok6xa.mongodb.net/book-exchange?retryWrites=true', {useNewUrlParser: true})
 
@@ -17,6 +18,7 @@ app.use(cors())
 app.use('/signup', signUpRouter)
 app.use('/login', loginRouter)
 app.use('/app/books', booksRouter)
+app.use('/app/users', userRouter)
 
 app.use((req, res, next) => {
     const error = new Error('Not found')
