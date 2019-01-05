@@ -6,6 +6,8 @@ const Book = require('../models/bookModel');
 router.get('/', (req, res) => {
     Book.find()
     .sort({date: -1})
+    .skip(req.query.search ? parseFloat(req.query.search) : 0)
+    .limit(10)
     .then(result => {
         console.log(result)
         res.status(200).json(result)
