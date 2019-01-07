@@ -45,7 +45,11 @@ router.post('/', (req, res) => {
                         password: hash,
                         username: req.body.username,
                         gender: req.body.gender,
-                        age: req.body.age
+                        age: req.body.age,
+                        books: {
+                            published: [],
+                            liked: []
+                        }
                     })
                     user.save()
                     .then(result => {
