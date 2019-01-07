@@ -22,8 +22,17 @@ router.get('/:userId', (req, res) => {
 router.post('/wishlist/:userId', (req, res) => {
     User.findById(req.params.userId)
     .then(user => {
-        console.log('USUARIO ENCONTRADO', user)
-        user.books.liked.push(req.body.book)
+        let bookLiked = user.books.liked.filter(b => b._id === req.body.book._id)
+        if(bookLiked.length > 0){
+            console.log('Entra al primero')
+            console.log(`COMPARANDOOOO => ${user.books.liked[0]._id} === ${req.body.book._id}`)
+            let index = user.books.liked.findIndex(x => x._id === req.body.book._id)
+            console.log( 'INDEXXXXXXX',index)
+            user.books.liked.splice(index ,1)
+        } else {
+            console.log('Entra al segundo')
+            user.books.liked.push(req.body.book)
+        }
         return user.save()
     })
     .then(result => {
