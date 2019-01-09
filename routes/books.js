@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router()
 
 const Book = require('../models/bookModel');
+const User = require('../models/userModel');
 
 router.get('/', (req, res) => {
     Book.find()
@@ -46,7 +47,14 @@ router.post('/', (req, res) => {
     })
     book.save()
     .then(result => {
-        res.status(200).json({message: "Book was added!", book: result})
+        User.findById(req.body.userId)
+        .then(user => {
+            user.books.published.push(book)
+            return user.save()
+        })
+        .then(result2 => {
+            res.status(200).json({message: "Book was added!", book: result})
+        })
     })
     .catch(err => {
         res.status(500).json({message: "Could not add book", error: err})
