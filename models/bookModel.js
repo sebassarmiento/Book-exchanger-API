@@ -10,7 +10,8 @@ const Book = mongoose.Schema({
     date: { type: Number, required: true },
     author: String,
     description: String,
-    pages: Number
+    pages: Number,
+    ratings: [Object]
 })
 
 module.exports = mongoose.model('Book', Book);

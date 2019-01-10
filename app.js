@@ -18,7 +18,7 @@ app.use(cors())
 app.use('/signup', signUpRouter)
 app.use('/login', loginRouter)
 app.use('/app/books', booksRouter)
-app.use('/app/users', userRouter)
+app.use('/app/user', userRouter)
 
 app.use((req, res, next) => {
     const error = new Error('Not found')

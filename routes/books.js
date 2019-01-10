@@ -43,7 +43,8 @@ router.post('/', (req, res) => {
         username: req.body.username,
         userId: req.body.userId,
         date: req.body.date,
-        pages: req.body.pages
+        pages: req.body.pages,
+        ratings: []
     })
     book.save()
     .then(result => {
@@ -58,6 +59,26 @@ router.post('/', (req, res) => {
     })
     .catch(err => {
         res.status(500).json({message: "Could not add book", error: err})
+    })
+})
+
+router.post('/:bookId/rating', (req, res) => {
+    console.log("AQUI AQUI AQUI", req.body.rating)
+    Book.findById(req.params.bookId)
+    .then(book => {
+        console.log('BOOK', book)
+        let index = book.ratings.findIndex(x => x.userId === req.body.userId)
+        if(index !== -1){
+            book.ratings.splice(index, 1)
+        }
+        book.ratings.push({ userId: req.body.userId, rating: req.body.rating })
+        return book.save()
+    })
+    .then(response => {
+        res.status(200).json({ message: "Rating added!", response })
+    })
+    .catch(err => {
+        res.status(500).json(err)
     })
 })
 
