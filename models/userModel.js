@@ -5,7 +5,7 @@ const User = mongoose.Schema({
     password: { type: String, required: true },
     username: { type: String, required: true },
     gender: { type: String, required: true },
-    age: { type: Number, required: true },
+    location: { type: String, required: true },
     books: {
         published: Array,
         liked: Array

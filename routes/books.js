@@ -19,6 +19,21 @@ router.get('/', (req, res) => {
     })
 })
 
+router.get('/category/:category', (req, res) => {
+    let capitalize = string => {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+    Book.find({category: capitalize(req.params.category)})
+    .then(result => {
+        console.log(result)
+        res.status(200).json(result)
+    })
+    .catch(err => {
+        console.log(err)
+        res.status(500).json(err)
+    })
+})
+
 router.get('/id/:bookId', (req, res) => {
     Book.findById(req.params.bookId)
     .select('-__v')
