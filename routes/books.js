@@ -51,7 +51,7 @@ router.post('/', (req, res) => {
     const book = new Book({
         name: req.body.name,
         category: req.body.category,
-        place: req.body.place,
+        location: req.body.location,
         image: req.body.image,
         author: req.body.author,
         description: req.body.description,
