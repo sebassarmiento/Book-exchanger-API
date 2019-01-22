@@ -48,6 +48,7 @@ router.get('/id/:bookId', (req, res) => {
 })
 
 router.post('/', (req, res) => {
+    console.log('Aquiiiii', req.body.location, typeof req.body.location)
     const book = new Book({
         name: req.body.name,
         category: req.body.category,
@@ -70,6 +71,9 @@ router.post('/', (req, res) => {
         })
         .then(result2 => {
             res.status(200).json({message: "Book was added!", book: result})
+        })
+        .catch(err => {
+            res.status(500).json({error: err})
         })
     })
     .catch(err => {
