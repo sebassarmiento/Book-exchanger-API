@@ -9,6 +9,7 @@ const signUpRouter = require('./routes/signUp');
 const loginRouter = require('./routes/login');
 const booksRouter = require('./routes/books');
 const userRouter = require('./routes/user');
+const chatsRouter = require('./routes/chat');
 
 mongoose.connect('mongodb+srv://sebastian:sarmiento@cluster0-ok6xa.mongodb.net/book-exchange?retryWrites=true', {useNewUrlParser: true})
 
@@ -19,6 +20,7 @@ app.use('/signup', signUpRouter)
 app.use('/login', loginRouter)
 app.use('/app/books', booksRouter)
 app.use('/app/user', userRouter)
+app.use('/app/chats', chatsRouter)
 
 app.use((req, res, next) => {
     const error = new Error('Not found')
