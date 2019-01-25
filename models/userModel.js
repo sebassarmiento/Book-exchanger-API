@@ -6,6 +6,7 @@ const User = mongoose.Schema({
     username: { type: String, required: true },
     gender: { type: String, required: true },
     location: { type: String, required: true },
+    chats: [{ id: String, messages: [{userId: String, text: String}] }],
     books: {
         published: Array,
         liked: Array
