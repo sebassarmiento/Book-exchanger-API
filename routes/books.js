@@ -5,10 +5,29 @@ const Book = require('../models/bookModel');
 const User = require('../models/userModel');
 
 router.get('/', (req, res) => {
+    let bookCount;
     Book.find()
     .sort({date: -1})
     .skip(req.query.search ? parseFloat(req.query.search) : 0)
     .limit(10)
+    .then(result => {
+        Book.find().countDocuments().then(async count => {
+            bookCount = await count
+            console.log(result, bookCount, 'Se manda la data')
+            return res.status(200).json({ data: result, count: bookCount })
+        })
+    })
+    .catch(err => {
+        console.log(err)
+        res.status(500).json(err)
+    })
+})
+
+router.get('/search', (req, res) => {
+    console.log('Entraaaa', req.query.name)
+    Book.find({name: { "$regex": req.query.name, "$options": "i" } })
+    .sort({date: -1})
+    .countDocuments((err, count) => console.log('Count!',count))
     .then(result => {
         console.log(result)
         res.status(200).json(result)
