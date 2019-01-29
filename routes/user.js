@@ -5,6 +5,7 @@ const User = require('../models/userModel');
 
 router.get('/:userId', (req, res) => {
     User.findById(req.params.userId)
+    .select('-password')
     .then(user => {
         console.log(user)
         if(user){
@@ -20,24 +21,24 @@ router.get('/:userId', (req, res) => {
 })
 
 router.post('/wishlist/:userId', (req, res) => {
+    let message;
     User.findById(req.params.userId)
     .then(user => {
         let bookLiked = user.books.liked.filter(b => b._id === req.body.book._id)
         if(bookLiked.length > 0){
-            console.log('Entra al primero')
-            console.log(`COMPARANDOOOO => ${user.books.liked[0]._id} === ${req.body.book._id}`)
             let index = user.books.liked.findIndex(x => x._id === req.body.book._id)
-            console.log( 'INDEXXXXXXX',index)
             user.books.liked.splice(index ,1)
+            message = `${req.body.book.name} was removed to your wishlist!`
         } else {
-            console.log('Entra al segundo')
             user.books.liked.push(req.body.book)
+            message = `${req.body.book.name} was added to your wishlist!`
         }
+        user.notifications.push({ category: 'success', message })
         return user.save()
     })
     .then(result => {
         console.log(result)
-        res.status(200).json({message: "Book added to wishlist", user: result})
+        res.status(200).json({result, message})
     })
     .catch(err => {
         console.log(err)

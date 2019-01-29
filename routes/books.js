@@ -56,17 +56,14 @@ router.get('/id/:bookId', (req, res) => {
     Book.findById(req.params.bookId)
     .select('-__v')
     .then(result => {
-        console.log(result)
         res.status(200).json(result)
     })
     .catch(err => {
-        console.log(result)
         res.status(500).json(err)
     })
 })
 
 router.post('/', (req, res) => {
-    console.log('Aquiiiii', req.body.location, typeof req.body.location)
     const book = new Book({
         name: req.body.name,
         category: req.body.category,
