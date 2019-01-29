@@ -27,9 +27,8 @@ router.get('/search', (req, res) => {
     console.log('Entraaaa', req.query.name)
     Book.find({name: { "$regex": req.query.name, "$options": "i" } })
     .sort({date: -1})
-    .countDocuments((err, count) => console.log('Count!',count))
     .then(result => {
-        console.log(result)
+        console.log('RESULTADO DE QUERY',result)
         res.status(200).json(result)
     })
     .catch(err => {
@@ -101,10 +100,10 @@ router.post('/', (req, res) => {
 })
 
 router.post('/:bookId/rating', (req, res) => {
-    console.log("AQUI AQUI AQUI", req.body.rating)
+    let bookName;
     Book.findById(req.params.bookId)
     .then(book => {
-        console.log('BOOK', book)
+        bookName = book.name
         let index = book.ratings.findIndex(x => x.userId === req.body.userId)
         if(index !== -1){
             book.ratings.splice(index, 1)
@@ -113,7 +112,16 @@ router.post('/:bookId/rating', (req, res) => {
         return book.save()
     })
     .then(response => {
-        res.status(200).json({ message: "Rating added!", response })
+        let notification;
+        User.findById(req.body.userId)
+        .then(user => {
+            notification = { category: 'success', message: `Your rating for ${bookName} was added!` }
+            user.notifications.push(notification)
+            return user.save()
+        })
+        .then(userUpdated => {
+            return res.status(200).json({ message: "Rating added!", response, notification })
+        })
     })
     .catch(err => {
         res.status(500).json(err)
