@@ -28,7 +28,7 @@ router.post('/wishlist/:userId', (req, res) => {
         if(bookLiked.length > 0){
             let index = user.books.liked.findIndex(x => x._id === req.body.book._id)
             user.books.liked.splice(index ,1)
-            message = `${req.body.book.name} was removed to your wishlist!`
+            message = `${req.body.book.name} was removed from your wishlist!`
         } else {
             user.books.liked.push(req.body.book)
             message = `${req.body.book.name} was added to your wishlist!`
@@ -38,7 +38,7 @@ router.post('/wishlist/:userId', (req, res) => {
     })
     .then(result => {
         console.log(result)
-        res.status(200).json({result, message})
+        res.status(200).json({user: result, message})
     })
     .catch(err => {
         console.log(err)

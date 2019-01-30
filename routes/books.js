@@ -9,7 +9,7 @@ router.get('/', (req, res) => {
     Book.find()
     .sort({date: -1})
     .skip(req.query.search ? parseFloat(req.query.search) : 0)
-    .limit(10)
+    .limit(20)
     .then(result => {
         Book.find().countDocuments().then(async count => {
             bookCount = await count
@@ -56,7 +56,12 @@ router.get('/id/:bookId', (req, res) => {
     Book.findById(req.params.bookId)
     .select('-__v')
     .then(result => {
-        res.status(200).json(result)
+        console.log('ACACAVACACACACA', result)
+        if(result){
+            res.status(200).json(result)
+        } else {
+            res.status(404).json({message: "Book not found"})
+        }
     })
     .catch(err => {
         res.status(500).json(err)
@@ -98,9 +103,12 @@ router.post('/', (req, res) => {
 
 router.post('/:bookId/rating', (req, res) => {
     let bookName;
+    let bookId;
     Book.findById(req.params.bookId)
     .then(book => {
+        console.log('Entra 1')
         bookName = book.name
+        bookId = book._id
         let index = book.ratings.findIndex(x => x.userId === req.body.userId)
         if(index !== -1){
             book.ratings.splice(index, 1)
@@ -109,18 +117,23 @@ router.post('/:bookId/rating', (req, res) => {
         return book.save()
     })
     .then(response => {
+        console.log('Entra 2')
         let notification;
         User.findById(req.body.userId)
         .then(user => {
-            notification = { category: 'success', message: `Your rating for ${bookName} was added!` }
+            console.log('Entra 3')
+            notification = { category: 'success', message: `Your rating for ${bookName} was added!`, link: bookId.toString() }
+            console.log('ACACACACACACACACAC', notification)
             user.notifications.push(notification)
             return user.save()
         })
         .then(userUpdated => {
+            console.log('Entra 4')
             return res.status(200).json({ message: "Rating added!", response, notification })
         })
     })
     .catch(err => {
+        console.log('Sale por errro')
         res.status(500).json(err)
     })
 })
