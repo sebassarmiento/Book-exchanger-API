@@ -7,65 +7,65 @@ const User = require('../models/userModel');
 router.get('/', (req, res) => {
     let bookCount;
     Book.find()
-    .sort({date: -1})
-    .skip(req.query.search ? parseFloat(req.query.search) : 0)
-    .limit(20)
-    .then(result => {
-        Book.find().countDocuments().then(async count => {
-            bookCount = await count
-            console.log(result, bookCount, 'Se manda la data')
-            return res.status(200).json({ data: result, count: bookCount })
+        .sort({ date: -1 })
+        .skip(req.query.search ? parseFloat(req.query.search) : 0)
+        .limit(20)
+        .then(result => {
+            Book.find().countDocuments().then(async count => {
+                bookCount = await count
+                console.log(result, bookCount, 'Se manda la data')
+                return res.status(200).json({ data: result, count: bookCount })
+            })
         })
-    })
-    .catch(err => {
-        console.log(err)
-        res.status(500).json(err)
-    })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json(err)
+        })
 })
 
 router.get('/search', (req, res) => {
     console.log('Entraaaa', req.query.name)
-    Book.find({name: { "$regex": req.query.name, "$options": "i" } })
-    .sort({date: -1})
-    .then(result => {
-        console.log('RESULTADO DE QUERY',result)
-        res.status(200).json(result)
-    })
-    .catch(err => {
-        console.log(err)
-        res.status(500).json(err)
-    })
+    Book.find({ name: { "$regex": req.query.name, "$options": "i" } })
+        .sort({ date: -1 })
+        .then(result => {
+            console.log('RESULTADO DE QUERY', result)
+            res.status(200).json(result)
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json(err)
+        })
 })
 
 router.get('/category/:category', (req, res) => {
     let capitalize = string => {
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
-    Book.find({category: capitalize(req.params.category)})
-    .then(result => {
-        console.log(result)
-        res.status(200).json(result)
-    })
-    .catch(err => {
-        console.log(err)
-        res.status(500).json(err)
-    })
+    Book.find({ category: capitalize(req.params.category) })
+        .then(result => {
+            console.log(result)
+            res.status(200).json(result)
+        })
+        .catch(err => {
+            console.log(err)
+            res.status(500).json(err)
+        })
 })
 
 router.get('/id/:bookId', (req, res) => {
     Book.findById(req.params.bookId)
-    .select('-__v')
-    .then(result => {
-        console.log('ACACAVACACACACA', result)
-        if(result){
-            res.status(200).json(result)
-        } else {
-            res.status(404).json({message: "Book not found"})
-        }
-    })
-    .catch(err => {
-        res.status(500).json(err)
-    })
+        .select('-__v')
+        .then(result => {
+            console.log('ACACAVACACACACA', result)
+            if (result) {
+                res.status(200).json(result)
+            } else {
+                res.status(404).json({ message: "Book not found" })
+            }
+        })
+        .catch(err => {
+            res.status(500).json(err)
+        })
 })
 
 router.post('/', (req, res) => {
@@ -83,57 +83,82 @@ router.post('/', (req, res) => {
         ratings: []
     })
     book.save()
-    .then(result => {
-        User.findById(req.body.userId)
-        .then(user => {
-            user.books.published.push(book)
-            return user.save()
-        })
-        .then(result2 => {
-            res.status(200).json({message: "Book was added!", book: result})
+        .then(result => {
+            User.findById(req.body.userId)
+                .then(user => {
+                    user.books.published.push(book)
+                    return user.save()
+                })
+                .then(result2 => {
+                    res.status(200).json({ message: "Book was added!", book: result })
+                })
+                .catch(err => {
+                    res.status(500).json({ error: err })
+                })
         })
         .catch(err => {
-            res.status(500).json({error: err})
+            res.status(500).json({ message: "Could not add book", error: err })
         })
-    })
-    .catch(err => {
-        res.status(500).json({message: "Could not add book", error: err})
-    })
 })
 
 router.post('/:bookId/rating', (req, res) => {
     let bookName;
     let bookId;
     Book.findById(req.params.bookId)
-    .then(book => {
-        console.log('Entra 1')
-        bookName = book.name
-        bookId = book._id
-        let index = book.ratings.findIndex(x => x.userId === req.body.userId)
-        if(index !== -1){
-            book.ratings.splice(index, 1)
-        }
-        book.ratings.push({ userId: req.body.userId, rating: req.body.rating })
-        return book.save()
-    })
-    .then(response => {
-        console.log('Entra 2')
-        let notification;
-        User.findById(req.body.userId)
-        .then(user => {
-            console.log('Entra 3')
-            notification = { category: 'success', message: `Your rating for ${bookName} was added!`, link: bookId.toString() }
-            console.log('ACACACACACACACACAC', notification)
-            user.notifications.push(notification)
-            return user.save()
+        .then(book => {
+            console.log('Entra 1')
+            bookName = book.name
+            bookId = book._id
+            let index = book.ratings.findIndex(x => x.userId === req.body.userId)
+            if (index !== -1) {
+                book.ratings.splice(index, 1)
+            }
+            book.ratings.push({ userId: req.body.userId, rating: req.body.rating })
+            return book.save()
         })
-        .then(userUpdated => {
-            console.log('Entra 4')
-            return res.status(200).json({ message: "Rating added!", response, notification })
+        .then(response => {
+            console.log('Entra 2')
+            let notification;
+            User.findById(req.body.userId)
+                .then(user => {
+                    console.log('Entra 3')
+                    notification = { category: 'success', message: `Your rating for ${bookName} was added!`, link: bookId.toString() }
+                    console.log('ACACACACACACACACAC', notification)
+                    user.notifications.push(notification)
+                    return user.save()
+                })
+                .then(userUpdated => {
+                    console.log('Entra 4')
+                    return res.status(200).json({ message: "Rating added!", response, notification })
+                })
         })
+        .catch(err => {
+            console.log('Sale por errro')
+            res.status(500).json(err)
+        })
+})
+
+router.post('/filters', (req, res) => {
+    let bookSearch;
+    if (req.body.categoryFilters.length > 0 && req.body.locationFilters.length > 0) {
+        
+        bookSearch = Book.find({ $and: [{ category: { $in: [...req.body.categoryFilters] } }, { location: { $in: [...req.body.locationFilters] } }] })            
+    
+    } else if(req.body.categoryFilters.length === 0 && req.body.locationFilters.length > 0){
+        
+        bookSearch = Book.find({ location: { $in: [...req.body.locationFilters] } })            
+    
+    } else if(req.body.categoryFilters.length > 0 && req.body.locationFilters.length === 0){
+        
+        bookSearch = Book.find({ category: { $in: [...req.body.categoryFilters] } })            
+    
+    }
+
+    bookSearch.then(books => {
+        res.status(200).json(books)
     })
     .catch(err => {
-        console.log('Sale por errro')
+        console.log(err)
         res.status(500).json(err)
     })
 })
