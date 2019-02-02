@@ -11,7 +11,8 @@ const Book = mongoose.Schema({
     author: String,
     description: String,
     pages: Number,
-    ratings: [Object]
+    ratings: [Object],
+    ratingsNumber: Number
 })
 
 module.exports = mongoose.model('Book', Book);

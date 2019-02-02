@@ -80,17 +80,20 @@ router.post('/', (req, res) => {
         userId: req.body.userId,
         date: req.body.date,
         pages: req.body.pages,
-        ratings: []
+        ratings: [],
+        ratingsNumber: 0
     })
     book.save()
         .then(result => {
+            let notification = { type: 'success', message: `Your book ${result.name} was published successfully!`, opened: false, link: result._id }
             User.findById(req.body.userId)
                 .then(user => {
                     user.books.published.push(book)
+                    user.notifications.push(notification)
                     return user.save()
                 })
                 .then(result2 => {
-                    res.status(200).json({ message: "Book was added!", book: result })
+                    res.status(200).json({ message: "Book was added!", notification })
                 })
                 .catch(err => {
                     res.status(500).json({ error: err })
@@ -106,7 +109,6 @@ router.post('/:bookId/rating', (req, res) => {
     let bookId;
     Book.findById(req.params.bookId)
         .then(book => {
-            console.log('Entra 1')
             bookName = book.name
             bookId = book._id
             let index = book.ratings.findIndex(x => x.userId === req.body.userId)
@@ -114,21 +116,18 @@ router.post('/:bookId/rating', (req, res) => {
                 book.ratings.splice(index, 1)
             }
             book.ratings.push({ userId: req.body.userId, rating: req.body.rating })
+            book.ratingsNumber = book.ratings.reduce((a, b) => ({ rating: a.rating + b.rating })).rating / book.ratings.length
             return book.save()
         })
         .then(response => {
-            console.log('Entra 2')
             let notification;
             User.findById(req.body.userId)
                 .then(user => {
-                    console.log('Entra 3')
                     notification = { category: 'success', message: `Your rating for ${bookName} was added!`, link: bookId.toString() }
-                    console.log('ACACACACACACACACAC', notification)
                     user.notifications.push(notification)
                     return user.save()
                 })
                 .then(userUpdated => {
-                    console.log('Entra 4')
                     return res.status(200).json({ message: "Rating added!", response, notification })
                 })
         })
@@ -139,21 +138,41 @@ router.post('/:bookId/rating', (req, res) => {
 })
 
 router.post('/filters', (req, res) => {
+    console.log('ACA MI BODY',req.body)
+    let categoryFilters = req.body.categoryFilters.length > 0 ? true : null
+    let locationFilters = req.body.locationFilters.length > 0 ? true : null
+    let ratingsFilter = req.body.ratingsFilter !== 0 ? true : null
     let bookSearch;
-    if (req.body.categoryFilters.length > 0 && req.body.locationFilters.length > 0) {
-        
-        bookSearch = Book.find({ $and: [{ category: { $in: [...req.body.categoryFilters] } }, { location: { $in: [...req.body.locationFilters] } }] })            
+
+    if (categoryFilters && locationFilters && ratingsFilter) {
+        // With category, location and ratings filters
+        bookSearch = Book.find({ $and: [{ category: { $in: [...req.body.categoryFilters] } }, { location: { $in: [...req.body.locationFilters] } }, { ratingsNumber: { $gt: req.body.ratingsFilter - 1 } }] })            
     
-    } else if(req.body.categoryFilters.length === 0 && req.body.locationFilters.length > 0){
-        
+    } else if(categoryFilters && locationFilters && !ratingsFilter){
+        // With category and location filters
+        bookSearch = Book.find({ $and: [{ category: { $in: [...req.body.categoryFilters] } }, { location: { $in: [...req.body.locationFilters] } } ] })
+
+    } else if(categoryFilters && !locationFilters && ratingsFilter){
+        // With category and ratings filters
+        bookSearch = Book.find({ $and: [{ category: { $in: [...req.body.categoryFilters] } }, { ratingsNumber: { $gt: req.body.ratingsFilter - 1 } } ] })
+
+    } if(!categoryFilters && locationFilters && ratingsFilter){
+        // With location and ratings filters
+        bookSearch = Book.find({ $and: [{ location: { $in: [...req.body.locationFilters] } }, { ratingsNumber: { $gt: req.body.ratingsFilter - 1 } } ] })
+
+    } else if(!categoryFilters && !locationFilters && ratingsFilter){
+        // With filters only
+        bookSearch = Book.find({ ratingsNumber: { $gt: req.body.ratingsFilter - 1 } })
+
+    } else if(!categoryFilters && !ratingsFilter && locationFilters){
+        // With location filters only
         bookSearch = Book.find({ location: { $in: [...req.body.locationFilters] } })            
     
-    } else if(req.body.categoryFilters.length > 0 && req.body.locationFilters.length === 0){
-        
+    } else if(categoryFilters && !locationFilters){
+        // With category filters only
         bookSearch = Book.find({ category: { $in: [...req.body.categoryFilters] } })            
     
     }
-
     bookSearch.then(books => {
         res.status(200).json(books)
     })
