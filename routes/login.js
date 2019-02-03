@@ -9,13 +9,15 @@ router.post('/', (req, res) => {
     User.findOne({email: req.body.email})
     .then(user => {
         if(user){
+            console.log('ACAAAAAAAAAA',req.body.password, user.password)
             bcrypt.compare(req.body.password, user.password, (err, result) => {
+                console.log('HERE', result)
                 if(err){
                     return res.status(500).json({
                         message: "Invalid login data",
                         error: err
                     })
-                } else {
+                } else if(result) {
                     const token = jwt.sign({
                         email: user.email,
                         id: user._id
@@ -24,6 +26,10 @@ router.post('/', (req, res) => {
                         message: "Auth successful",
                         token,
                         user
+                    })
+                } else {
+                    return res.status(500).json({
+                        message: "Invalid login data"
                     })
                 }
             })

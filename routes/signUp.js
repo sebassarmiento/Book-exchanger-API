@@ -5,16 +5,6 @@ const bcrypt = require('bcrypt');
 
 const User = require('../models/userModel');
 
-router.get('/', (req, res) => {
-    User.find()
-    .then(result => {
-        res.json({message: "Here is the list of users", users: result})
-    })
-    .catch(err => {
-        res.status(404).json({message: "error"})
-    })
-})
-
 router.get('/check-email/:email', (req, res) => {
     User.find({email: req.params.email})
     .then(result => {
@@ -40,6 +30,7 @@ router.post('/', (req, res) => {
                     console.log('Entra en error', err)
                     return res.status(500).json(err)
                 } else {
+                    let notification = { type: 'success', message: `Hey there ${req.body.username}! You have 1 message from Sebas Sarmiento.`, opened: false, link: "5c3384e3f728c50d5a46984e" }
                     const user = new User({
                         email: req.body.email,
                         password: hash,
@@ -50,7 +41,8 @@ router.post('/', (req, res) => {
                         books: {
                             published: [],
                             liked: []
-                        }
+                        },
+                        notifications: [notification]
                     })
                     user.save()
                     .then(result => {

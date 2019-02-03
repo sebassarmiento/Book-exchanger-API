@@ -13,7 +13,6 @@ router.get('/', (req, res) => {
         .then(result => {
             Book.find().countDocuments().then(async count => {
                 bookCount = await count
-                console.log(result, bookCount, 'Se manda la data')
                 return res.status(200).json({ data: result, count: bookCount })
             })
         })
@@ -24,7 +23,6 @@ router.get('/', (req, res) => {
 })
 
 router.get('/search', (req, res) => {
-    console.log('Entraaaa', req.query.name)
     Book.find({ name: { "$regex": req.query.name, "$options": "i" } })
         .sort({ date: -1 })
         .then(result => {
@@ -146,30 +144,37 @@ router.post('/filters', (req, res) => {
 
     if (categoryFilters && locationFilters && ratingsFilter) {
         // With category, location and ratings filters
+        console.log('Entra al 1')
         bookSearch = Book.find({ $and: [{ category: { $in: [...req.body.categoryFilters] } }, { location: { $in: [...req.body.locationFilters] } }, { ratingsNumber: { $gt: req.body.ratingsFilter - 1 } }] })            
     
     } else if(categoryFilters && locationFilters && !ratingsFilter){
         // With category and location filters
+        console.log('Entra al 2')
         bookSearch = Book.find({ $and: [{ category: { $in: [...req.body.categoryFilters] } }, { location: { $in: [...req.body.locationFilters] } } ] })
 
     } else if(categoryFilters && !locationFilters && ratingsFilter){
         // With category and ratings filters
+        console.log('Entra al 3')
         bookSearch = Book.find({ $and: [{ category: { $in: [...req.body.categoryFilters] } }, { ratingsNumber: { $gt: req.body.ratingsFilter - 1 } } ] })
 
     } if(!categoryFilters && locationFilters && ratingsFilter){
         // With location and ratings filters
+        console.log('Entra al 4')
         bookSearch = Book.find({ $and: [{ location: { $in: [...req.body.locationFilters] } }, { ratingsNumber: { $gt: req.body.ratingsFilter - 1 } } ] })
 
     } else if(!categoryFilters && !locationFilters && ratingsFilter){
         // With filters only
+        console.log('Entra al 5')
         bookSearch = Book.find({ ratingsNumber: { $gt: req.body.ratingsFilter - 1 } })
 
     } else if(!categoryFilters && !ratingsFilter && locationFilters){
         // With location filters only
+        console.log('Entra al 6')
         bookSearch = Book.find({ location: { $in: [...req.body.locationFilters] } })            
     
-    } else if(categoryFilters && !locationFilters){
+    } else if(categoryFilters && !locationFilters && !ratingsFilter){
         // With category filters only
+        console.log('Entra al 7')
         bookSearch = Book.find({ category: { $in: [...req.body.categoryFilters] } })            
     
     }
