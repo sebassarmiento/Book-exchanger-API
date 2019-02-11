@@ -35,7 +35,7 @@ router.post('/', (req, res) => {
                         email: req.body.email,
                         password: hash,
                         username: req.body.username,
-                        gender: req.body.gender,
+                        description: req.body.description,
                         location: req.body.location,
                         chats: [],
                         books: {
