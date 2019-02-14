@@ -23,7 +23,9 @@ app.use('/app/books', booksRouter)
 app.use('/app/user', userRouter)
 app.use('/app/chats', chatsRouter)
 
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
+process.env.PWD = process.cwd()
+
+app.use('/public', express.static(path.join(process.env.PWD + '/public')))
 
 app.use((req, res, next) => {
     const error = new Error('Not found')
