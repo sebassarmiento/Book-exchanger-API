@@ -23,7 +23,7 @@ app.use('/app/books', booksRouter)
 app.use('/app/user', userRouter)
 app.use('/app/chats', chatsRouter)
 
-app.use('/uploads', express.static(path.join(__dirname + '/uploads')))
+app.use('/uploads', express.static(path.join(__dirname + '/app/uploads')))
 
 app.use((req, res, next) => {
     const error = new Error('Not found')
