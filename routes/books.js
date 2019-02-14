@@ -8,22 +8,18 @@ const multer = require('multer')
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        console.log('Entra 1')
         cb(null, './uploads')
     },
     filename: (req, file, cb) => {
         cb(null, Date.now().toString() + file.originalname)
-        console.log('Entra 2')
     }
 })
 
 const fileFilter = (req, file, cb) => {
     if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg'){
         cb(null, true)
-        console.log('Entra 3')
     } else {
         cb(null, false)
-        console.log('Entra 4')
     }
 }
 
@@ -121,10 +117,12 @@ router.post('/', upload.single('image'), (req, res) => {
                     res.status(200).json({ message: "Book was added!", notification })
                 })
                 .catch(err => {
+                    console.log('Entra 1')
                     res.status(500).json({ error: err })
                 })
         })
         .catch(err => {
+            console.log('Entra 2')
             res.status(500).json({ message: "Could not add book", error: err })
         })
 })
