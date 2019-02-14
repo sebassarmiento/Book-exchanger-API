@@ -4,6 +4,32 @@ const router = express.Router()
 const Book = require('../models/bookModel');
 const User = require('../models/userModel');
 
+const multer = require('multer')
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        console.log('Entra 1')
+        cb(null, './uploads')
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now().toString() + file.originalname)
+        console.log('Entra 2')
+    }
+})
+
+const fileFilter = (req, file, cb) => {
+    if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg'){
+        cb(null, true)
+        console.log('Entra 3')
+    } else {
+        cb(null, false)
+        console.log('Entra 4')
+    }
+}
+
+const upload = multer({storage, fileFilter})
+
+
 router.get('/', (req, res) => {
     let bookCount;
     Book.find()
@@ -66,12 +92,13 @@ router.get('/id/:bookId', (req, res) => {
         })
 })
 
-router.post('/', (req, res) => {
+router.post('/', upload.single('image'), (req, res) => {
+    console.log('ACA MI FILE', req.file)
     const book = new Book({
         name: req.body.name,
         category: req.body.category,
         location: req.body.location,
-        image: req.body.image,
+        image: req.file ? req.file.path : null,
         author: req.body.author,
         description: req.body.description,
         username: req.body.username,

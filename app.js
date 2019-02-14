@@ -2,6 +2,7 @@ const express = require('express');
 const app = express()
 const cors = require('cors');
 const mongoose = require('mongoose');
+const path = require('path');
 
 const validToken = require('./middleware/validToken');
 
@@ -21,6 +22,8 @@ app.use('/login', loginRouter)
 app.use('/app/books', booksRouter)
 app.use('/app/user', userRouter)
 app.use('/app/chats', chatsRouter)
+
+app.use('/uploads', express.static(path.join(__dirname + '/uploads')))
 
 app.use((req, res, next) => {
     const error = new Error('Not found')
