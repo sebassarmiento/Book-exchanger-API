@@ -30,7 +30,7 @@ router.post('/', (req, res) => {
                     console.log('Entra en error', err)
                     return res.status(500).json(err)
                 } else {
-                    let notification = { type: 'success', message: `Hey there ${req.body.username}! You have 1 message from Sebas Sarmiento.`, opened: false, link: "5c3384e3f728c50d5a46984e" }
+                    let notification = { type: 'success', message: `Hey there ${req.body.username}! How about you publish your first book?`, opened: false, link: "publish" }
                     const user = new User({
                         email: req.body.email,
                         password: hash,
