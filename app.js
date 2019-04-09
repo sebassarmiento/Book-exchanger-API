@@ -12,7 +12,13 @@ const booksRouter = require('./routes/books');
 const userRouter = require('./routes/user');
 const chatsRouter = require('./routes/chat');
 
-mongoose.connect('mongodb+srv://sebastian:sarmiento@cluster0-ok6xa.mongodb.net/book-exchange?retryWrites=true', {useNewUrlParser: true})
+mongoose.connect('mongodb+srv://sebastian:cacafea@cluster0-ok6xa.mongodb.net/book-exchange?retryWrites=true', {useNewUrlParser: true})
+        .then(() => {
+            console.log("Connected to Database");
+            })
+        .catch((err) => {
+            console.log("Not Connected to Database ERROR! ", err);
+        })
 
 app.use(express.json())
 app.use(cors())
